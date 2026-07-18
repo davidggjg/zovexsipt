@@ -1,0 +1,23 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Every deploy re-fetches movies.json fresh from the main site (see src/lib/movies.js),
+# so a rebuild is all that's needed to pick up new content. Trigger rebuilds either by:
+#  1. Pushing to this repo, or
+#  2. Calling this site's Netlify Build Hook on a schedule (see .github/workflows/rebuild.yml)
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404

@@ -1,0 +1,127 @@
+---
+import Layout from "../components/Layout.astro";
+import MovieCard from "../components/MovieCard.astro";
+import { getCatalog, getCategories } from "../lib/movies.js";
+
+const catalog = await getCatalog();
+const categories = getCategories(catalog);
+
+const title = "Zovex Catalog — מאגר מידע לסרטים, סדרות ואנימה";
+const description = `קטלוג מידע עם ${catalog.length} כותרים: סרטים, סדרות ואנימה — פוסטרים, תקצירים, קטגוריות ושנות יציאה. חיפוש וסינון חכם.`;
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: title,
+    description,
+    url: Astro.site?.toString(),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: catalog.slice(0, 200).map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${Astro.site?.toString().replace(/\/$/, "")}/${item.slug}`,
+      name: item.title,
+    })),
+  },
+];
+---
+
+<Layout title={title} description={description} path="/" jsonLd={jsonLd} keywords={["סרטים", "סדרות", "אנימה", "קטלוג", "מאגר מידע"]}>
+  <section class="hero">
+    <h1>Zovex Catalog</h1>
+    <p>מאגר מידע על {catalog.length} סרטים, סדרות ואנימה &mdash; פוסטרים, תקצירים וקטגוריות. חפשו והתרשמו.</p>
+  </section>
+
+  <div class="search-box" style="margin: 0 auto 8px; max-width: 480px;">
+    <input id="search" type="search" placeholder="חיפוש לפי שם..." autocomplete="off" />
+  </div>
+
+  <div class="filters" id="filters" style="justify-content: center;">
+    <button class="chip active" data-cat="all">הכל</button>
+    {categories.map((cat) => (
+      <button class="chip" data-cat={cat}>{cat}</button>
+    ))}
+  </div>
+
+  <div class="grid" id="grid">
+    {catalog.map((item, i) => (
+      <div class="grid-item" data-index={i}>
+        <MovieCard item={item} />
+      </div>
+    ))}
+  </div>
+
+  <p class="empty-state" id="empty" style="display:none;">לא נמצאו תוצאות תואמות.</p>
+  <div class="sentinel" id="sentinel"></div>
+</Layout>
+
+<script>
+  const PAGE_SIZE = 40;
+  const grid = document.getElementById("grid");
+  const items = Array.from(grid.querySelectorAll(".grid-item"));
+  const searchInput = document.getElementById("search");
+  const filterBtns = document.querySelectorAll("#filters .chip");
+  const emptyState = document.getElementById("empty");
+  const sentinel = document.getElementById("sentinel");
+
+  let activeCategory = "all";
+  let query = "";
+  let visibleCount = PAGE_SIZE;
+
+  function matches(el) {
+    const card = el.querySelector(".card");
+    const t = (card.dataset.title || "").toLowerCase();
+    const c = card.dataset.category || "";
+    const okCat = activeCategory === "all" || c === activeCategory;
+    const okQuery = !query || t.includes(query);
+    return okCat && okQuery;
+  }
+
+  function render() {
+    const filtered = items.filter(matches);
+    let shown = 0;
+    for (const el of items) {
+      const ok = matches(el);
+      if (ok && shown < visibleCount) {
+        el.style.display = "";
+        shown++;
+      } else {
+        el.style.display = "none";
+      }
+    }
+    emptyState.style.display = filtered.length === 0 ? "block" : "none";
+  }
+
+  searchInput.addEventListener("input", (e) => {
+    query = e.target.value.trim().toLowerCase();
+    visibleCount = PAGE_SIZE;
+    render();
+  });
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filterBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeCategory = btn.dataset.cat;
+      visibleCount = PAGE_SIZE;
+      render();
+    });
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        visibleCount += PAGE_SIZE;
+        render();
+      }
+    },
+    { rootMargin: "400px" }
+  );
+  observer.observe(sentinel);
+
+  render();
+</script>

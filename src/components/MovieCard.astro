@@ -1,0 +1,16 @@
+---
+const { item } = Astro.props;
+const metaBits = [item.category, item.year].filter(Boolean).join(" · ");
+---
+
+<a class="card" href={`/${item.slug}`} data-title={item.title} data-category={item.category}>
+  <div class="poster-wrap">
+    {item.poster && (
+      <img src={item.poster} alt={item.title} loading="lazy" decoding="async" width="300" height="450" />
+    )}
+  </div>
+  <div class="info">
+    <p class="title">{item.title}</p>
+    <p class="meta">{metaBits}</p>
+  </div>
+</a>

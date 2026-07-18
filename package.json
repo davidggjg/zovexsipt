@@ -1,0 +1,17 @@
+{
+  "name": "zovex-landing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^5.9.0",
+    "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/rss": "^4.0.9"
+  }
+}

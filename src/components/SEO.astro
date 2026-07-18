@@ -1,0 +1,46 @@
+---
+// src/components/SEO.astro
+const {
+  title,
+  description,
+  image,
+  path = "/",
+  type = "website",
+  keywords = [],
+  jsonLd = [],
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, "") || "";
+const canonical = `${siteUrl}${path}`;
+const ogImage = image || `${siteUrl}/social-default.svg`;
+const siteName = "Zovex Catalog";
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+{keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
+<link rel="canonical" href={canonical} />
+<meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"} />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="he_IL" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{jsonLd.map((schema) => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}

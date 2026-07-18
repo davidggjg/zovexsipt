@@ -1,0 +1,39 @@
+---
+import SEO from "./SEO.astro";
+import "../styles/global.css";
+
+const { title, description, image, path, type, keywords, jsonLd, noindex } = Astro.props;
+---
+
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <SEO
+    title={title}
+    description={description}
+    image={image}
+    path={path}
+    type={type}
+    keywords={keywords}
+    jsonLd={jsonLd}
+    noindex={noindex}
+  />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container bar">
+      <a href="/" class="brand">Zovex Catalog</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <slot />
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Zovex Catalog &mdash; מאגר מידע על סרטים, סדרות ואנימה. עמוד זה מיועד למידע בלבד.</p>
+    </div>
+  </footer>
+</body>
+</html>
