@@ -1,10 +1,11 @@
 ---
 import Layout from "../components/Layout.astro";
 import MovieCard from "../components/MovieCard.astro";
-import { getCatalog, getCategories } from "../lib/movies.js";
+import { getCatalog, getCategories, getLiveChannels, MAIN_SITE_URL } from "../lib/movies.js";
 
 const catalog = await getCatalog();
 const categories = getCategories(catalog);
+const liveChannels = await getLiveChannels();
 
 const title = "Zovex Catalog — מאגר מידע לסרטים, סדרות ואנימה";
 const description = `קטלוג מידע עם ${catalog.length} כותרים: סרטים, סדרות ואנימה — פוסטרים, תקצירים, קטגוריות ושנות יציאה. חיפוש וסינון חכם.`;
@@ -35,6 +36,26 @@ const jsonLd = [
     <h1>Zovex Catalog</h1>
     <p>מאגר מידע על {catalog.length} סרטים, סדרות ואנימה &mdash; פוסטרים, תקצירים וקטגוריות. חפשו והתרשמו.</p>
   </section>
+
+  {liveChannels.length > 0 && (
+    <section class="live-section">
+      <div class="live-heading">
+        <span class="live-pulse-dot"></span>
+        <h2>שידורים חיים עכשיו</h2>
+      </div>
+      <div class="live-row">
+        {liveChannels.map((ch) => (
+          <a class="live-card" href={`${MAIN_SITE_URL.replace(/\/$/, "")}/live/${ch.slug}`} rel="noopener">
+            <div class="live-poster-wrap">
+              {ch.poster && <img src={ch.poster} alt={ch.title} loading="lazy" decoding="async" />}
+              <span class="live-badge">LIVE</span>
+            </div>
+            <p class="live-title">{ch.title}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
 
   <div class="search-box" style="margin: 0 auto 8px; max-width: 480px;">
     <input id="search" type="search" placeholder="חיפוש לפי שם..." autocomplete="off" />

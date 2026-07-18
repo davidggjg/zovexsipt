@@ -18,8 +18,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Where the main site publishes its data. Override via env var if it ever moves.
 export const MAIN_SITE_URL = process.env.MAIN_SITE_URL || "https://davidggjg.github.io/zovex";
 export const MOVIES_JSON_URL = process.env.MOVIES_JSON_URL || `${MAIN_SITE_URL}/movies.json`;
+const MAIN_SITE_ORIGIN = new URL(MAIN_SITE_URL).origin;
+
+// Some poster/thumbnail URLs on the main site are root-relative (e.g. live
+// channel logos: "/zovex/live-logos/kan11.png"). On this separate domain a
+// relative path like that would 404, so resolve it against the main site's
+// origin instead of its own.
+function resolveImage(url) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/")) return MAIN_SITE_ORIGIN + url;
+  return url;
+}
 
 let cache = null;
+let liveCache = null;
 
 async function fetchLiveCatalog() {
   const res = await fetch(MOVIES_JSON_URL, {
@@ -75,7 +88,7 @@ function normalize(rawRows) {
         description: row.description || "",
         category: row.category || "",
         year: row.year || null,
-        poster: row.thumbnail_url || "",
+        poster: resolveImage(row.thumbnail_url),
         isSeries,
         franchise: row.franchise || null,
         createdDate: row.created_date || null,
@@ -86,7 +99,7 @@ function normalize(rawRows) {
     const entry = bySlug.get(slug);
     // Keep the newest description/poster/year if a later row has richer data
     if (!entry.description && row.description) entry.description = row.description;
-    if (!entry.poster && row.thumbnail_url) entry.poster = row.thumbnail_url;
+    if (!entry.poster && row.thumbnail_url) entry.poster = resolveImage(row.thumbnail_url);
     if (!entry.year && row.year) entry.year = row.year;
     if (row.created_date && (!entry.createdDate || row.created_date > entry.createdDate)) {
       entry.createdDate = row.created_date;
@@ -134,6 +147,25 @@ export async function getCatalog() {
 export async function getBySlug(slug) {
   const catalog = await getCatalog();
   return catalog.find((c) => c.slug === slug) || null;
+}
+
+/**
+ * Live broadcast channels currently active on the main site. These don't get
+ * their own catalog/info page here (there's no extra info to show beyond the
+ * poster) - they link straight out to the main site's live player.
+ */
+export async function getLiveChannels() {
+  if (liveCache) return liveCache;
+  const raw = await loadRawCatalog();
+  liveCache = raw
+    .filter((row) => row && row.is_live)
+    .map((row) => ({
+      title: row.title || row.name || "שידור חי",
+      slug: row.custom_slug || slugify(row.title || row.name || ""),
+      poster: resolveImage(row.thumbnail_url),
+    }))
+    .filter((ch) => ch.slug);
+  return liveCache;
 }
 
 export function getCategories(catalog) {
