@@ -15,10 +15,10 @@ const siteUrl = Astro.site?.toString().replace(/\/$/, "") || "";
 const path = `/${item.slug}`;
 const watchUrl = `${MAIN_SITE_URL.replace(/\/$/, "")}/${item.slug}`;
 
-const title = `${item.title}${item.year ? ` (${item.year})` : ""} — צפייה ומידע | Zovex Catalog`;
+const title = `${item.title}${item.year ? ` (${item.year})` : ""} — צפייה ישירה | ZOVEX`;
 const description = item.description
   ? item.description.slice(0, 155)
-  : `מידע על ${item.title}: פוסטר, תקציר, קטגוריה ושנת יציאה.`;
+  : `צפייה ישירה ב${item.title} - פוסטר, תקציר, קטגוריה ושנת יציאה.`;
 
 const schemaType = item.isSeries ? "TVSeries" : "Movie";
 
@@ -38,7 +38,7 @@ const jsonLd = [
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Zovex Catalog", item: siteUrl + "/" },
+      { "@type": "ListItem", position: 1, name: "ZOVEX", item: siteUrl + "/" },
       { "@type": "ListItem", position: 2, name: item.category || "קטלוג", item: siteUrl + "/" },
       { "@type": "ListItem", position: 3, name: item.title, item: siteUrl + path },
     ],
@@ -52,11 +52,11 @@ const jsonLd = [
   image={item.poster}
   path={path}
   type={item.isSeries ? "video.tv_series" : "video.movie"}
-  keywords={[item.title, item.category, "צפייה", "מידע", "קטלוג"].filter(Boolean)}
+  keywords={[item.title, item.category, "צפייה ישירה", "ZOVEX"].filter(Boolean)}
   jsonLd={jsonLd}
 >
   <nav class="breadcrumbs" aria-label="breadcrumb">
-    <a href="/">Zovex Catalog</a> / <span>{item.category || "קטלוג"}</span> / <span>{item.title}</span>
+    <a href="/">ZOVEX</a> / <span>{item.category || "קטגוריה"}</span> / <span>{item.title}</span>
   </nav>
 
   <section class="detail-hero">
@@ -65,7 +65,7 @@ const jsonLd = [
 
     <div class="detail-content">
       <div class="poster-col">
-        {item.poster && <img src={item.poster} alt={item.title} width="400" height="600" />}
+        {item.poster && <img src={item.poster} alt={item.title} width="400" height="600" loading="eager" />}
       </div>
       <div class="info-col">
         <div class="badge-row">

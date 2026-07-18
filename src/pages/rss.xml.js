@@ -5,8 +5,8 @@ export async function GET(context) {
   const catalog = await getCatalog();
 
   return rss({
-    title: "Zovex Catalog — עדכוני קטלוג",
-    description: "עדכונים אחרונים בקטלוג הסרטים, הסדרות והאנימה.",
+    title: "ZOVEX — עדכונים אחרונים",
+    description: "עדכונים אחרונים בסרטים, בסדרות ובאנימה באתר ZOVEX.",
     site: context.site,
     items: catalog.slice(0, 100).map((item) => ({
       title: `${item.title}${item.year ? ` (${item.year})` : ""}`,
