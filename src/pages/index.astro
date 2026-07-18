@@ -8,7 +8,7 @@ const categories = getCategories(catalog);
 const liveChannels = await getLiveChannels();
 
 const title = "ZOVEX — צפייה ישירה בסרטים, סדרות ואנימה";
-const description = `ZOVEX - צפייה ישירה ב-${catalog.length} סרטים, סדרות ואנימה בחינם. חיפוש וסינון לפי קטגוריה.`;
+const description = `ZOVEX - צפייה ישירה בסרטים, סדרות ואנימה בחינם. חיפוש וסינון לפי קטגוריה.`;
 
 const jsonLd = [
   {
@@ -34,7 +34,7 @@ const jsonLd = [
 <Layout title={title} description={description} path="/" jsonLd={jsonLd} keywords={["סרטים", "סדרות", "אנימה", "צפייה ישירה", "ZOVEX"]}>
   <section class="hero">
     <h1>ZOVEX</h1>
-    <p>צפייה ישירה ב-{catalog.length} סרטים, סדרות ואנימה בחינם &mdash; חפשו והתחילו לצפות.</p>
+    <p>צפייה ישירה בסרטים, סדרות ואנימה בחינם &mdash; חפשו והתחילו לצפות.</p>
   </section>
 
   {liveChannels.length > 0 && (
