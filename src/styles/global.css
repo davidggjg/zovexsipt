@@ -261,8 +261,14 @@ header.site-header {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   color: white;
   border: none;
-  cursor: not-allowed;
-  opacity: 0.55;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.watch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .watch-hint {

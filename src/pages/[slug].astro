@@ -1,6 +1,6 @@
 ---
 import Layout from "../components/Layout.astro";
-import { getCatalog } from "../lib/movies.js";
+import { getCatalog, MAIN_SITE_URL } from "../lib/movies.js";
 
 export async function getStaticPaths() {
   const catalog = await getCatalog();
@@ -13,6 +13,7 @@ export async function getStaticPaths() {
 const { item } = Astro.props;
 const siteUrl = Astro.site?.toString().replace(/\/$/, "") || "";
 const path = `/${item.slug}`;
+const watchUrl = `${MAIN_SITE_URL.replace(/\/$/, "")}/${item.slug}`;
 
 const title = `${item.title}${item.year ? ` (${item.year})` : ""} — צפייה ומידע | Zovex Catalog`;
 const description = item.description
@@ -82,10 +83,10 @@ const jsonLd = [
 
         {item.description && <p class="description">{item.description}</p>}
 
-        <button class="watch-btn" type="button" disabled aria-disabled="true">
-          ▶ צפה עכשיו
-        </button>
-        <span class="watch-hint">עמוד מידע בלבד — קישור הצפייה אינו פעיל כרגע.</span>
+        <a class="watch-btn" href={watchUrl} rel="noopener">
+          ▶ צפה עכשיו ב-ZOVEX
+        </a>
+        <span class="watch-hint">הצפייה בפועל מתבצעת באתר ZOVEX הראשי.</span>
       </div>
     </div>
   </section>

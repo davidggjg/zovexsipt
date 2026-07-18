@@ -1,5 +1,6 @@
 ---
 import SEO from "./SEO.astro";
+import { MAIN_SITE_URL } from "../lib/movies.js";
 import "../styles/global.css";
 
 const { title, description, image, path, type, keywords, jsonLd, noindex } = Astro.props;
@@ -32,7 +33,7 @@ const { title, description, image, path, type, keywords, jsonLd, noindex } = Ast
 
   <footer class="site-footer">
     <div class="container">
-      <p>Zovex Catalog &mdash; מאגר מידע על סרטים, סדרות ואנימה. עמוד זה מיועד למידע בלבד.</p>
+      <p>Zovex Catalog &mdash; מאגר מידע על סרטים, סדרות ואנימה. לצפייה בפועל: <a href={MAIN_SITE_URL}>ZOVEX</a>.</p>
     </div>
   </footer>
 </body>
