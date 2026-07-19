@@ -7,6 +7,24 @@ const catalog = await getCatalog();
 const categories = getCategories(catalog);
 const liveChannels = await getLiveChannels();
 
+// The homepage used to server-render every single catalog item (300+) at
+// once, relying on client JS to hide the rest with display:none - but the
+// images (300+ <img> tags, all already in the initial DOM) still got
+// evaluated/loaded far more eagerly than intended, making first load very
+// heavy. Now only the first page is real server-rendered HTML (fast paint,
+// works with no JS); everything else is a small JSON payload the client
+// script turns into DOM nodes on demand (scroll/search/filter), so the
+// browser only ever fetches images for cards that actually get shown.
+const PAGE_SIZE = 40;
+const firstPage = catalog.slice(0, PAGE_SIZE);
+const catalogLite = catalog.map((item) => ({
+  slug: item.slug,
+  title: item.title,
+  poster: item.poster || "",
+  category: item.category || "",
+  year: item.year || "",
+}));
+
 const title = "ZOVEX — צפייה ישירה בסרטים, סדרות ואנימה";
 const description = `ZOVEX - צפייה ישירה בסרטים, סדרות ואנימה בחינם. חיפוש וסינון לפי קטגוריה.`;
 
@@ -69,8 +87,8 @@ const jsonLd = [
   </div>
 
   <div class="grid" id="grid">
-    {catalog.map((item, i) => (
-      <div class="grid-item" data-index={i}>
+    {firstPage.map((item) => (
+      <div class="grid-item">
         <MovieCard item={item} />
       </div>
     ))}
@@ -80,10 +98,8 @@ const jsonLd = [
   <div class="sentinel" id="sentinel"></div>
 </Layout>
 
-<script>
-  const PAGE_SIZE = 40;
+<script define:vars={{ catalogData: catalogLite, PAGE_SIZE }}>
   const grid = document.getElementById("grid");
-  const items = Array.from(grid.querySelectorAll(".grid-item"));
   const searchInput = document.getElementById("search");
   const filterBtns = document.querySelectorAll("#filters .chip");
   const emptyState = document.getElementById("empty");
@@ -93,27 +109,35 @@ const jsonLd = [
   let query = "";
   let visibleCount = PAGE_SIZE;
 
-  function matches(el) {
-    const card = el.querySelector(".card");
-    const t = (card.dataset.title || "").toLowerCase();
-    const c = card.dataset.category || "";
-    const okCat = activeCategory === "all" || c === activeCategory;
+  function matches(item) {
+    const t = (item.title || "").toLowerCase();
+    const okCat = activeCategory === "all" || item.category === activeCategory;
     const okQuery = !query || t.includes(query);
     return okCat && okQuery;
   }
 
+  function cardHtml(item) {
+    const meta = [item.category, item.year].filter(Boolean).join(" · ");
+    const img = item.poster
+      ? `<img src="${item.poster}" alt="${item.title}" loading="lazy" decoding="async" width="300" height="450" />`
+      : "";
+    return `<div class="grid-item"><a class="card" href="/${item.slug}" data-title="${item.title}" data-category="${item.category}">
+      <div class="poster-wrap">${img}</div>
+      <div class="info"><p class="title">${item.title}</p><p class="meta">${meta}</p></div>
+    </a></div>`;
+  }
+
   function render() {
-    const filtered = items.filter(matches);
-    let shown = 0;
-    for (const el of items) {
-      const ok = matches(el);
-      if (ok && shown < visibleCount) {
-        el.style.display = "";
-        shown++;
-      } else {
-        el.style.display = "none";
-      }
+    const isDefaultView = activeCategory === "all" && !query;
+    // Default view with nothing scrolled yet: keep the server-rendered
+    // first page exactly as-is (real HTML, no JS needed, fastest possible
+    // paint) - don't touch the DOM at all.
+    if (isDefaultView && visibleCount <= PAGE_SIZE) {
+      emptyState.style.display = "none";
+      return;
     }
+    const filtered = catalogData.filter(matches);
+    grid.innerHTML = filtered.slice(0, visibleCount).map(cardHtml).join("");
     emptyState.style.display = filtered.length === 0 ? "block" : "none";
   }
 
@@ -143,6 +167,4 @@ const jsonLd = [
     { rootMargin: "400px" }
   );
   observer.observe(sentinel);
-
-  render();
 </script>
