@@ -119,8 +119,12 @@ function normalize(rawRows) {
       const seasons = new Set(entry.episodes.map((e) => e.season));
       entry.seasonCount = seasons.size;
       entry.episodeCount = entry.episodes.length;
+      // ממוין לפי עונה ואז לפי מספר פרק - נשמר (לא נמחק יותר) כדי שעמוד
+      // ה-slug יוכל להציג רשימת פרקים אמיתית, לא רק "X עונות / Y פרקים".
+      entry.episodes.sort((a, b) => (a.season - b.season) || (a.episode - b.episode));
+    } else {
+      delete entry.episodes;
     }
-    delete entry.episodes;
     return entry;
   });
 

@@ -393,6 +393,62 @@ header.site-header {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
+.episodes-section {
+  position: relative;
+  z-index: 2;
+  margin-top: 40px;
+  max-width: 760px;
+}
+
+.season-group {
+  margin-bottom: 28px;
+}
+
+.season-title {
+  font-size: 20px;
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+.episode-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.episode-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.episode-row:hover {
+  border-color: var(--accent);
+  transform: translateX(-2px);
+}
+
+.episode-num {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.episode-title {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 .watch-hint {
   display: block;
   margin-top: 10px;

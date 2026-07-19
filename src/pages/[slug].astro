@@ -89,5 +89,27 @@ const jsonLd = [
         <span class="watch-hint">הצפייה בפועל מתבצעת באתר ZOVEX הראשי.</span>
       </div>
     </div>
+
+    {item.isSeries && item.episodes?.length > 0 && (
+      <div class="episodes-section">
+        {Array.from(new Set(item.episodes.map((e) => e.season))).map((season) => (
+          <div class="season-group">
+            <h2 class="season-title">עונה {season}</h2>
+            <ul class="episode-list">
+              {item.episodes
+                .filter((e) => e.season === season)
+                .map((ep) => (
+                  <li>
+                    <a class="episode-row" href={watchUrl} rel="noopener">
+                      <span class="episode-num">פרק {ep.episode}</span>
+                      {ep.title && <span class="episode-title">{ep.title}</span>}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    )}
   </section>
 </Layout>
